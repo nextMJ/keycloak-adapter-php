@@ -1,0 +1,18 @@
+{
+  "name": "keycloak-adapter",
+  "version": "2.0.17",
+  "description": "Keycloak PHP Adapter",
+  "scripts": {
+    "tests": "vendor/bin/tester tests/"
+  },
+  "keywords": [
+    "ataccama",
+    "keycloak"
+  ],
+  "author": "Miroslav Stolfa",
+  "license": "MIT",
+  "devDependencies": {
+  },
+  "dependencies": {
+  }
+}
