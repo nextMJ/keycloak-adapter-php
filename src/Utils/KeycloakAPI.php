@@ -37,7 +37,8 @@
                 'grant_type'   => 'authorization_code',
                 'code'         => $authorizationCode,
                 'client_id'    => $keycloak->clientId,
-                'redirect_uri' => $keycloak->redirectUri
+                'redirect_uri' => $keycloak->redirectUri,
+                'client_secret' => $keycloak->clientSecret,
             ];
 
             if (!empty($keycloak->clientSecret)) {
