@@ -127,6 +127,7 @@
 
             $response = Curl::post("$keycloak->host/auth/admin/realms/$keycloak->realmId/users", [
                 "Content-Type"  => "application/json",
+                "User-Agent"   => $keycloak->clientId,
                 "Authorization" => "Bearer " . $keycloak->apiAccessToken->bearer
             ], json_encode($request));
 
@@ -150,6 +151,7 @@
             $response = Curl::get("$keycloak->host/auth/admin/realms/$keycloak->realmId/users?email=" .
                 urlencode($email), [
                 "Content-Type"  => "application/json",
+                "User-Agent"   => $keycloak->clientId,
                 "Authorization" => "Bearer " . $keycloak->apiAccessToken->bearer
             ]);
 
@@ -176,7 +178,8 @@
         public static function reauthorize(Keycloak $keycloak, RefreshToken $userRefreshToken): AuthorizationResponse
         {
             $response = Curl::post("$keycloak->host/auth/realms/$keycloak->realmId/protocol/openid-connect/token", [
-                "Content-Type" => "application/x-www-form-urlencoded"
+                "Content-Type" => "application/x-www-form-urlencoded",
+                "User-Agent"   => $keycloak->clientId
             ], [
                 'grant_type'    => 'refresh_token',
                 'refresh_token' => $userRefreshToken->refreshToken,
@@ -215,7 +218,8 @@
             }
 
             $response = Curl::post("$keycloak->host/auth/realms/$keycloak->realmId/protocol/openid-connect/logout", [
-                "Content-Type" => "application/x-www-form-urlencoded"
+                "Content-Type" => "application/x-www-form-urlencoded",
+                "User-Agent"   => $keycloak->clientId
             ], $data);
 
             if ($response->code == 200 || $response->code == 204) {
@@ -278,6 +282,7 @@
                 [
                     "Content-Type"  => "application/json",
                     "Authorization" => "Bearer " . $keycloak->apiAccessToken->bearer,
+                    "User-Agent"   => $keycloak->clientId
                 ], json_encode([
                     "temporary" => $temporary,
                     "type"      => "password",
@@ -315,6 +320,7 @@
 
             $response = Curl::post("$keycloak->host/auth/realms/$keycloak->realmId/protocol/openid-connect/token", [
                 "Content-Type" => "application/x-www-form-urlencoded",
+                "User-Agent"   => $keycloak->clientId
             ], [
                 "grant_type"    => "password",
                 "client_id"     => $keycloak->clientId,
@@ -353,7 +359,8 @@
         {
             $response = Curl::post("$keycloak->host/auth/realms/$keycloak->realmId/protocol/openid-connect/token/introspect",
                 [
-                    "Content-Type" => "application/x-www-form-urlencoded"
+                    "Content-Type" => "application/x-www-form-urlencoded",
+                    "User-Agent"   => $keycloak->clientId
                 ], [
                     'token'         => $token,
                     'client_id'     => $keycloak->clientId,

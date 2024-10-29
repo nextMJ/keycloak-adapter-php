@@ -2,7 +2,7 @@
   "name": "stolfam/keycloak-adapter-php",
   "license": "MIT",
   "description": "Easy-to-use PHP adapter for Keycloak authentication",
-  "version": "2.0.19",
+  "version": "2.0.20",
   "type": "library",
   "require": {
     "php": ">= 7.2.0",
