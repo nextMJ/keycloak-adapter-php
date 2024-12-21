@@ -14,7 +14,7 @@
     use Ataccama\Utils\AuthorizationResponse;
     use Ataccama\Utils\KeycloakAPI;
     use Ataccama\Utils\RefreshToken;
-
+    use Ataccama\Utils\AccessToken;
 
     /**
      * Class Auth
@@ -27,9 +27,6 @@
 
         /** @var string */
         protected $state;
-
-        /** @var string[] */
-        public $errors = [];
 
         /**
          * Re-authentication loads Keycloak, so keep this number as high as possible.
@@ -120,15 +117,27 @@
 
         public function isSessionExpired(): bool
         {
+            $refreshToken = $this->getRefreshToken();
+
             // waiting for next re-auth
             if (time() < ($this->getLastReAuth() + $this->reAuthSleepTime)) {
                 return false;
             }
 
-            return !$this->isRefreshTokenValid();
+            try {
+                $response = KeycloakAPI::reauthorize($this->keycloak, $refreshToken);
+                $this->setAuthorized(true);
+                $this->authorized($this->getUserProfile($response));
+                $this->notifyReAuth();
+
+                return false;
+            } catch (\Exception $e) {
+                return true;
+            }
         }
 
-        /**
+	/**
+	 * NEW method by source - not used by nextMJ implementation
          * @return bool
          */
         public function isRefreshTokenValid(): bool
@@ -153,8 +162,9 @@
             $userIdentity = $response->accessToken->getUserIdentity();
 
             return new UserProfile($userIdentity->getId(), $userIdentity->getName(), $userIdentity->getEmail(),
+                $response->getAccessToken(),
                 $response->refreshToken->refreshToken, $response->refreshToken->expiration,
-                $userIdentity->getRoles($this->keycloak->clientId), $userIdentity->username);
+                $userIdentity->getRoles(""), $userIdentity->getGroups(), $userIdentity->username);
         }
 
         /**

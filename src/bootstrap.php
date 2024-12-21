@@ -10,6 +10,7 @@
     require __DIR__ . "/Exceptions/NotAuthorized.php";
     require __DIR__ . "/Exceptions/MissingParameter.php";
     require __DIR__ . "/Exceptions/CurlException.php";
+    require __DIR__ . "/Exceptions/CurlTimeout.php";
     require __DIR__ . "/Exceptions/NotAuthenticated.php";
     require __DIR__ . "/Exceptions/NotDefined.php";
     require __DIR__ . "/Exceptions/UnknownError.php";

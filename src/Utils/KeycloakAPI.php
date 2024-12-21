@@ -34,18 +34,17 @@
         public static function getAuthorization(Keycloak $keycloak, string $authorizationCode): AuthorizationResponse
         {
             $request = [
-                'grant_type'    => 'authorization_code',
-                'code'          => $authorizationCode,
-                'client_id'     => $keycloak->clientId,
-                'redirect_uri'  => $keycloak->redirectUri,
-                'client_secret' => $keycloak->clientSecret,
+                'grant_type'   => 'authorization_code',
+                'code'         => $authorizationCode,
+                'client_id'    => $keycloak->clientId,
+                'redirect_uri' => $keycloak->redirectUri
             ];
 
             if (!empty($keycloak->clientSecret)) {
                 $request["client_secret"] = $keycloak->clientSecret;
             }
 
-            $response = Curl::post("$keycloak->host/auth/realms/$keycloak->realmId/protocol/openid-connect/token", [
+            $response = Curl::post("$keycloak->host/realms/$keycloak->realmId/protocol/openid-connect/token", [
                 "Content-Type" => "application/x-www-form-urlencoded",
                 "User-Agent"   => $keycloak->clientId
             ], $request);
@@ -69,7 +68,7 @@
          */
         public static function getApiAuthorization(KeycloakExtended $keycloak): AuthorizationResponse
         {
-            $response = Curl::post("$keycloak->host/auth/realms/$keycloak->realmId/protocol/openid-connect/token", [
+            $response = Curl::post("$keycloak->host/realms/$keycloak->realmId/protocol/openid-connect/token", [
                 "Content-Type" => "application/x-www-form-urlencoded",
                 "User-Agent"   => $keycloak->apiClientId
             ], [
@@ -125,7 +124,7 @@
                 $request["emailVerified"] = true;
             }
 
-            $response = Curl::post("$keycloak->host/auth/admin/realms/$keycloak->realmId/users", [
+            $response = Curl::post("$keycloak->host/admin/realms/$keycloak->realmId/users", [
                 "Content-Type"  => "application/json",
                 "User-Agent"   => $keycloak->clientId,
                 "Authorization" => "Bearer " . $keycloak->apiAccessToken->bearer
@@ -148,7 +147,7 @@
             KeycloakExtended $keycloak,
             string $email
         ): User {
-            $response = Curl::get("$keycloak->host/auth/admin/realms/$keycloak->realmId/users?email=" .
+            $response = Curl::get("$keycloak->host/admin/realms/$keycloak->realmId/users?email=" .
                 urlencode($email), [
                 "Content-Type"  => "application/json",
                 "User-Agent"   => $keycloak->clientId,
@@ -177,7 +176,7 @@
          */
         public static function reauthorize(Keycloak $keycloak, RefreshToken $userRefreshToken): AuthorizationResponse
         {
-            $response = Curl::post("$keycloak->host/auth/realms/$keycloak->realmId/protocol/openid-connect/token", [
+            $response = Curl::post("$keycloak->host/realms/$keycloak->realmId/protocol/openid-connect/token", [
                 "Content-Type" => "application/x-www-form-urlencoded",
                 "User-Agent"   => $keycloak->clientId
             ], [
@@ -217,7 +216,7 @@
                 $data["client_secret"] = $keycloak->clientSecret;
             }
 
-            $response = Curl::post("$keycloak->host/auth/realms/$keycloak->realmId/protocol/openid-connect/logout", [
+            $response = Curl::post("$keycloak->host/realms/$keycloak->realmId/protocol/openid-connect/logout", [
                 "Content-Type" => "application/x-www-form-urlencoded",
                 "User-Agent"   => $keycloak->clientId
             ], $data);
@@ -236,7 +235,7 @@
 
         public static function userExists(KeycloakExtended $keycloak, string $email): bool
         {
-            $response = Curl::get("$keycloak->host/auth/admin/realms/$keycloak->realmId/users?email=" .
+            $response = Curl::get("$keycloak->host/admin/realms/$keycloak->realmId/users?email=" .
                 urlencode($email), [
                 "Authorization" => "Bearer " . $keycloak->apiAccessToken->bearer
             ]);
@@ -255,7 +254,7 @@
 
         public static function getUsernameByEmail(KeycloakExtended $keycloak, string $email): ?string
         {
-            $response = Curl::get("$keycloak->host/auth/admin/realms/$keycloak->realmId/users?email=" .
+            $response = Curl::get("$keycloak->host/admin/realms/$keycloak->realmId/users?email=" .
                 urlencode($email), [
                 "Authorization" => "Bearer " . $keycloak->apiAccessToken->bearer
             ]);
@@ -278,7 +277,7 @@
             string $password,
             bool $temporary = false
         ) {
-            $response = Curl::put("$keycloak->host/auth/admin/realms/$keycloak->realmId/users/$keycloakId/reset-password",
+            $response = Curl::put("$keycloak->host/admin/realms/$keycloak->realmId/users/$keycloakId/reset-password",
                 [
                     "Content-Type"  => "application/json",
                     "Authorization" => "Bearer " . $keycloak->apiAccessToken->bearer,
@@ -318,7 +317,7 @@
                 throw new NotDefined("Optional parameter 'clientSecret' is not defined. You have to define it for logging via API.");
             }
 
-            $response = Curl::post("$keycloak->host/auth/realms/$keycloak->realmId/protocol/openid-connect/token", [
+            $response = Curl::post("$keycloak->host/realms/$keycloak->realmId/protocol/openid-connect/token", [
                 "Content-Type" => "application/x-www-form-urlencoded",
                 "User-Agent"   => $keycloak->clientId
             ], [
@@ -336,7 +335,8 @@
 
                 return new UserProfile($userIdentity->getId(), $userIdentity->getName(), $userIdentity->getEmail(),
                     $response->refreshToken->refreshToken, $response->refreshToken->expiration,
-                    $userIdentity->getRoles($keycloak->clientId), $userIdentity->username);
+                    $userIdentity->getRoles($keycloak->clientId), $userIdentity->getGroups(),
+                    $userIdentity->username);
             }
 
             if (isset($response->body->error)) {

@@ -18,14 +18,14 @@
      * @property-read string   $id
      * @property-read string   $username
      * @property-read string[] $roles
+     * @property-read string[] $groups
      */
     class UserIdentity
     {
         use SmartObject;
 
-
         /** @var string[] */
-        private $roles;
+        private $roles, $groups;
 
         /** @var string */
         protected $email, $name, $id, $username;
@@ -37,10 +37,17 @@
         public function __construct(\stdClass $userIdentity)
         {
             $this->id = $userIdentity->sub;
-            $this->email = $userIdentity->email ?? '';
-            $this->name = $userIdentity->name ?? '';
-            $this->username = $userIdentity->preferred_username ?? '';
-            $this->roles = $userIdentity->resource_access ?? [];
+            $this->email = $userIdentity->email ?? 'unknown';
+            $this->name = $userIdentity->name ?? 'unknown';
+            $this->username = $userIdentity->preferred_username ?? 'unknown';
+            $this->roles = $userIdentity->realm_access->roles ? 'unknown';
+
+            if (isset($userIdentity->group)) {
+                $this->groups = $userIdentity->group;
+                $this->groups = substr_replace($this->groups, '', 0, 1);    // all groups starts with '/' --> remove it
+            } else {
+                $this->groups = array();
+            }
         }
 
         /**
@@ -48,7 +55,7 @@
          */
         public function getEmail(): string
         {
-            return $this->email ?? "";
+            return $this->email ?? "unknown";
         }
 
         /**
@@ -56,7 +63,7 @@
          */
         public function getName(): string
         {
-            return $this->name ?? "";
+            return $this->name ?? "unknown";
         }
 
         /**
@@ -64,7 +71,7 @@
          */
         public function getId(): string
         {
-            return $this->id ?? "";
+            return $this->id ?? "unknown";
         }
 
         /**
@@ -72,7 +79,7 @@
          */
         public function getUsername(): string
         {
-            return $this->username ?? "";
+            return $this->username ?? "unknown";
         }
 
         /**
@@ -81,6 +88,10 @@
          */
         public function getRoles(string $clientId): array
         {
+            return $this->roles;
+
+            /* original code - not suitable for our application
+
             if (isset($this->roles->{"$clientId"})) {
                 $roles = [];
                 foreach ($this->roles->{"$clientId"}->roles as $role) {
@@ -90,6 +101,15 @@
                 return $roles;
             }
 
-            return [];
+            return [];*/
         }
+
+        /**
+         * @return string[]
+         */
+        public function getGroups(): array
+        {
+            return $this->groups;
+        }
+
     }

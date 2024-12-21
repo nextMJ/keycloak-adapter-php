@@ -10,6 +10,7 @@
 
 
     use Nette\SmartObject;
+    use Ataccama\Utils\AccessToken;
 
 
     /**
@@ -31,16 +32,20 @@
         protected $id, $name, $email, $refreshToken, $username;
 
         /** @var string[] */
-        protected $roles;
+        protected $roles, $groups;
 
         /** @var int */
         protected $refreshTokenExpiration;
+
+        /** @var AccessToken */
+        protected $accessToken;
 
         /**
          * UserProfile constructor.
          * @param string   $id
          * @param string   $name
          * @param string   $email
+         * @param AccessToken $accessToken
          * @param string   $refreshToken
          * @param int      $refreshTokenExpiration
          * @param string[] $roles
@@ -49,17 +54,21 @@
             string $id,
             string $name,
             string $email,
+            AccessToken $accessToken,
             string $refreshToken,
             int $refreshTokenExpiration,
             array $roles,
+            array $groups,
             string $username
         ) {
             $this->id = $id;
             $this->name = $name;
             $this->email = $email;
+            $this->accessToken = $accessToken;
             $this->refreshToken = $refreshToken;
             $this->refreshTokenExpiration = $refreshTokenExpiration;
             $this->roles = $roles;
+            $this->groups = $groups;
             $this->username = $username;
         }
 
@@ -96,6 +105,14 @@
         }
 
         /**
+         * @return AccessToken
+         */
+        public function getAccessToken(): AccessToken
+        {
+            return $this->accessToken;
+        }
+
+        /**
          * @return string
          */
         public function getRefreshToken(): string
@@ -117,5 +134,13 @@
         public function getRoles(): array
         {
             return $this->roles;
+        }
+
+        /**
+         * @return string[]
+         */
+        public function getGroups(): array
+        {
+            return $this->groups;
         }
     }
