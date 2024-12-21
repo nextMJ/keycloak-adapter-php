@@ -40,7 +40,7 @@
             $this->email = $userIdentity->email ?? 'unknown';
             $this->name = $userIdentity->name ?? 'unknown';
             $this->username = $userIdentity->preferred_username ?? 'unknown';
-            $this->roles = $userIdentity->realm_access->roles ? 'unknown';
+            $this->roles = $userIdentity->realm_access->roles ?? 'unknown';
 
             if (isset($userIdentity->group)) {
                 $this->groups = $userIdentity->group;
